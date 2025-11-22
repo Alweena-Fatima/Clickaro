@@ -282,8 +282,8 @@ const Navbar = () => {
                 </Link>
 
                 {/* Admin Button for specific email */}
-                {user?.email === "alweenasabir123@gmail.com" && (
-                  <Link to={"/admin"} className="btn btn-info mx-1">
+                {user?.role === "admin" && (
+                  <Link to={"/admin"} className="btn btn-warning mx-1">
                     <span className="material-symbols-outlined">admin_panel_settings</span>
                     Admin
                   </Link>

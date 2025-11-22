@@ -1,14 +1,12 @@
 import React from 'react';
 
-const AdminProductCard = ({ product, onRemove }) => {
-  const handleEdit = () => {
-    console.log("Editing product:", product._id);
-    alert("Edit functionality is not implemented in this demo.");
-  };
-
+// Added 'onEdit' prop
+const AdminProductCard = ({ product, onRemove, onEdit }) => {
+  
   return (
     <>
       <style jsx>{`
+        /* ... Keep your existing styles here ... */
         .admin-card {
           background: white;
           border-radius: 20px;
@@ -101,9 +99,10 @@ const AdminProductCard = ({ product, onRemove }) => {
         />
         <div className="admin-card-body">
           <h5 className="admin-card-title">{product.title}</h5>
-          <p className="admin-card-Dprice">{product.price} ₹</p>
+          <p className="admin-card-price">{product.price} ₹</p>
           <div className="admin-buttons">
-            <button className="btn btn-edit" onClick={handleEdit}>
+            {/* Call onEdit with the specific product data */}
+            <button className="btn btn-edit" onClick={() => onEdit(product)}>
               Edit
             </button>
             <button className="btn btn-remove" onClick={() => onRemove(product._id)}>
