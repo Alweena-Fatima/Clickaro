@@ -3,24 +3,34 @@ import { Payment } from "../Models/Payment.js";
 // -----------------------
 // CREATE ORDER 
 // -----------------------
+// COD (Cash On Delivery) / Direct Order Logic
 export const checkout = async (req, res) => {
   const { amount, cartItems, userShipping, userId } = req.body;
 
-  // Just create a simple order object without Razorpay
-  const order = {
-    orderId: "ORDER_" + Date.now(),  // dummy unique id
-    amount,
-    cartItems,
-    userShipping,
-    userId,
-    payStatus: "created",
-  };
+  try {
+    // 1. Create a fake Order ID (since we aren't getting one from a gateway)
+    const orderId = `ORD-${Date.now()}`;
 
-  res.json({
-    message: "Order created (no payment gateway used)",
-    success: true,
-    order,
-  });
+    // 2. Create the Order in Database
+    const order = await Payment.create({
+      orderId,
+      paymentId: "COD-PAYMENT", // Placeholder ID
+      signature: "COD-SIGNATURE", // Placeholder
+      amount,
+      orderItems: cartItems,
+      userId,
+      userShipping,
+      payStatus: "Paid", // Or "Pending" if you prefer
+    });
+
+    res.json({
+      success: true,
+      message: "Order Placed Successfully!",
+      order,
+    });
+  } catch (error) {
+    res.json({ message: error.message, success: false });
+  }
 };
 
 

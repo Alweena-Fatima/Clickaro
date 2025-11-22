@@ -6,9 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AppState = (props) => {
   const url = "http://localhost:1000/api";
-
   //const url = "https://mern-e-commerce-api-youtube.onrender.com/api";
-
 
   const [products, setProducts] = useState([]);
   const [token, setToken] = useState([]);
@@ -28,7 +26,7 @@ const AppState = (props) => {
         },
         withCredentials: true,
       });
-      console.log(api.data.products);
+      // console.log(api.data.products);
       setProducts(api.data.products);
       setFilteredData(api.data.products);
       userProfile();
@@ -41,13 +39,10 @@ const AppState = (props) => {
 
   useEffect(() => {
     let lstoken = localStorage.getItem("token");
-    // console.log("ls token ",lstoken)
     if (lstoken) {
       setToken(lstoken);
       setIsAuthenticated(true);
     }
-
-    // setToken(localStorage.getItem('token'))
   }, []);
 
   // register user
@@ -62,7 +57,6 @@ const AppState = (props) => {
         withCredentials: true,
       }
     );
-    // alert(api.data.message)
     toast.success(api.data.message, {
       position: "top-right",
       autoClose: 1500,
@@ -74,9 +68,7 @@ const AppState = (props) => {
       theme: "dark",
       transition: Bounce,
     });
-
     return api.data;
-    // console.log("user register ",api)
   };
 
   // login user
@@ -91,7 +83,6 @@ const AppState = (props) => {
         withCredentials: true,
       }
     );
-    // alert(api.data.message)
     toast.success(api.data.message, {
       position: "top-right",
       autoClose: 1500,
@@ -103,8 +94,6 @@ const AppState = (props) => {
       theme: "dark",
       transition: Bounce,
     });
-
-    // console.log("user login ",api.data)
     setToken(api.data.token);
     setIsAuthenticated(true);
     localStorage.setItem("token", api.data.token);
@@ -138,13 +127,11 @@ const AppState = (props) => {
       },
       withCredentials: true,
     });
-    // console.log("user profile ",api.data);
     setUser(api.data.user);
   };
 
   // add To Cart
   const addToCart = async (productId, title, price, qty, imgSrc) => {
-    console.log("product id = ", productId);
     const api = await axios.post(
       `${url}/cart/add`,
       { productId, title, price, qty, imgSrc },
@@ -157,7 +144,6 @@ const AppState = (props) => {
       }
     );
     setReload(!reload);
-    //  console.log("my cart ",api)
     toast.success(api.data.message, {
       position: "top-right",
       autoClose: 1500,
@@ -180,9 +166,7 @@ const AppState = (props) => {
       },
       withCredentials: true,
     });
-    //  console.log("user cart ",api.data.cart);
     setCart(api.data.cart);
-    //  setUser("user cart ",api);
   };
 
   //  --qty
@@ -199,7 +183,6 @@ const AppState = (props) => {
       }
     );
     setReload(!reload);
-    // console.log("decrease cart items ",api);
     toast.success(api.data.message, {
       position: "top-right",
       autoClose: 1500,
@@ -211,8 +194,6 @@ const AppState = (props) => {
       theme: "dark",
       transition: Bounce,
     });
-    //  setCart(api.data.cart);
-    //  setUser("user cart ",api);
   };
 
   //  remove Item from cart
@@ -225,7 +206,6 @@ const AppState = (props) => {
       withCredentials: true,
     });
     setReload(!reload);
-    // console.log("remove item from cart ",api);
     toast.success(api.data.message, {
       position: "top-right",
       autoClose: 1500,
@@ -237,8 +217,6 @@ const AppState = (props) => {
       theme: "dark",
       transition: Bounce,
     });
-    //  setCart(api.data.cart);
-    //  setUser("user cart ",api);
   };
 
   //  clear Cart
@@ -251,7 +229,6 @@ const AppState = (props) => {
       withCredentials: true,
     });
     setReload(!reload);
-    // console.log("remove item from cart ",api);
     toast.success(api.data.message, {
       position: "top-right",
       autoClose: 1500,
@@ -263,8 +240,6 @@ const AppState = (props) => {
       theme: "dark",
       transition: Bounce,
     });
-    //  setCart(api.data.cart);
-    //  setUser("user cart ",api);
   };
 
   //  Add Shipping Address
@@ -289,7 +264,6 @@ const AppState = (props) => {
       }
     );
     setReload(!reload);
-    // console.log("remove item from cart ",api);
     toast.success(api.data.message, {
       position: "top-right",
       autoClose: 1500,
@@ -302,8 +276,6 @@ const AppState = (props) => {
       transition: Bounce,
     });
     return api.data;
-    //  setCart(api.data.cart);
-    //  setUser("user cart ",api);
   };
 
   // get User latest address
@@ -315,7 +287,6 @@ const AppState = (props) => {
       },
       withCredentials: true,
     });
-    //  console.log("user address ", api.data.userAddress);
     setUserAddress(api.data.userAddress);
   };
 
@@ -328,11 +299,11 @@ const AppState = (props) => {
       },
       withCredentials: true,
     });
-    //  console.log("user order ", api.data);
-    setUserOrder(api.data)
-    
+    // console.log("user order ", api.data);
+    setUserOrder(api.data);
   };
-console.log("user order = ", userOrder);
+  
+  // console.log("user order = ", userOrder);
 
   return (
     <AppContext.Provider
@@ -356,6 +327,7 @@ console.log("user order = ", userOrder);
         shippingAddress,
         userAddress,
         userOrder,
+        user_Order, // <--- Added this here so Checkout.jsx can call it!
       }}
     >
       {props.children}

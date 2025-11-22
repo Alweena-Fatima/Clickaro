@@ -3,9 +3,12 @@ import AppContext from "../context/AppContext";
 import axios from "axios";
 import TableProduct from "./TableProduct";
 import { useNavigate } from "react-router-dom";
+import { toast, Bounce } from "react-toastify";
 
 const Checkout = () => {
-  const { cart, userAddress, url, user, clearCart } = useContext(AppContext);
+  // 1. Destructure user_Order from context
+  const { cart, userAddress, url, user, clearCart, user_Order } = useContext(AppContext);
+  
   const [qty, setQty] = useState(0);
   const [price, setPrice] = useState(0);
   const navigate = useNavigate();
@@ -13,55 +16,50 @@ const Checkout = () => {
   useEffect(() => {
     let qty = 0;
     let price = 0;
-
     if (cart?.items) {
       cart.items.forEach((item) => {
         qty += item.qty;
         price += item.price;
       });
     }
-
     setQty(qty);
     setPrice(price);
   }, [cart]);
 
   const handlePayment = async () => {
     try {
-      const checkoutRes = await axios.post(`${url}/payment/checkout`, {
+      const api = await axios.post(`${url}/payment/checkout`, {
         amount: price,
         cartItems: cart?.items,
         userShipping: userAddress,
         userId: user._id,
       });
 
-      console.log("Checkout Response:", checkoutRes.data);
+      if (api.data.success) {
+        await clearCart();
+        
+        // 2. FETCH THE LATEST ORDERS BEFORE NAVIGATING
+        await user_Order(); 
 
-      if (!checkoutRes.data.success) {
-        alert("Failed to create order!");
-        return;
-      }
+        toast.success("Order Placed Successfully!", {
+          position: "top-right",
+          autoClose: 1500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
 
-      const order = checkoutRes.data.order;
-
-      const verifyRes = await axios.post(`${url}/payment/verify`, {
-        orderId: order.orderId,
-        amount: order.amount,
-        orderItems: order.cartItems,
-        userId: order.userId,
-        userShipping: order.userShipping,
-      });
-
-      console.log("Verify Response:", verifyRes.data);
-
-      if (verifyRes.data.success) {
-        clearCart();
-        navigate("/oderconfirmation");
+        navigate("/profile");
       } else {
-        alert("Order failed to save!");
+        toast.error("Order Failed!");
       }
     } catch (error) {
       console.log("Order Error:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     }
   };
 
@@ -252,6 +250,7 @@ const Checkout = () => {
           transition: all 0.3s ease;
           box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
+  
 
         .btn-pay:hover {
           transform: translateY(-3px);
@@ -305,7 +304,6 @@ const Checkout = () => {
         <div className="container">
           <div className="checkout-card">
             <div className="checkout-grid">
-              {/* Product Details Section */}
               <div className="checkout-section product-section">
                 <div className="section-header">
                   <span className="material-symbols-outlined section-icon">
@@ -316,7 +314,6 @@ const Checkout = () => {
                 <TableProduct cart={cart} />
               </div>
 
-              {/* Shipping Address Section */}
               <div className="checkout-section">
                 <div className="section-header">
                   <span className="material-symbols-outlined section-icon">
@@ -326,54 +323,42 @@ const Checkout = () => {
                 </div>
                 <ul className="shipping-info-list">
                   <li>
-                    <span className="material-symbols-outlined info-icon">
-                      person
-                    </span>
+                    <span className="material-symbols-outlined info-icon">person</span>
                     <div className="info-content">
                       <div className="info-label">Full Name</div>
                       <div className="info-value">{userAddress?.fullName}</div>
                     </div>
                   </li>
                   <li>
-                    <span className="material-symbols-outlined info-icon">
-                      call
-                    </span>
+                    <span className="material-symbols-outlined info-icon">call</span>
                     <div className="info-content">
                       <div className="info-label">Phone Number</div>
                       <div className="info-value">{userAddress?.phoneNumber}</div>
                     </div>
                   </li>
                   <li>
-                    <span className="material-symbols-outlined info-icon">
-                      public
-                    </span>
+                    <span className="material-symbols-outlined info-icon">public</span>
                     <div className="info-content">
                       <div className="info-label">Country</div>
                       <div className="info-value">{userAddress?.country}</div>
                     </div>
                   </li>
                   <li>
-                    <span className="material-symbols-outlined info-icon">
-                      map
-                    </span>
+                    <span className="material-symbols-outlined info-icon">map</span>
                     <div className="info-content">
                       <div className="info-label">State</div>
                       <div className="info-value">{userAddress?.state}</div>
                     </div>
                   </li>
                   <li>
-                    <span className="material-symbols-outlined info-icon">
-                      pin_drop
-                    </span>
+                    <span className="material-symbols-outlined info-icon">pin_drop</span>
                     <div className="info-content">
                       <div className="info-label">PIN Code</div>
                       <div className="info-value">{userAddress?.pincode}</div>
                     </div>
                   </li>
                   <li>
-                    <span className="material-symbols-outlined info-icon">
-                      home
-                    </span>
+                    <span className="material-symbols-outlined info-icon">home</span>
                     <div className="info-content">
                       <div className="info-label">Address</div>
                       <div className="info-value">{userAddress?.address}</div>
@@ -384,7 +369,6 @@ const Checkout = () => {
             </div>
           </div>
 
-          {/* Payment Section */}
           <div className="payment-section">
             <div className="payment-summary">
               <div className="summary-row">
@@ -405,9 +389,9 @@ const Checkout = () => {
 
             <button className="btn-pay" onClick={handlePayment}>
               <span className="material-symbols-outlined btn-icon">
-                credit_card
+                check_circle
               </span>
-              Proceed to Payment
+              Place Order (COD)
             </button>
           </div>
         </div>

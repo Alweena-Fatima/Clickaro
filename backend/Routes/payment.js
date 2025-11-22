@@ -1,22 +1,13 @@
-import express from 'express'
-import {
-  checkout,
-  verify,
-  userOrder,
-  allOrders,
-} from "../Controllers/payment.js";
-import {Authenticated} from '../Middlewares/auth.js'
+import express from 'express';
+import { checkout, userOrder } from '../Controllers/payment.js'; // Import the new checkout
+import { Authenticated } from '../Middlewares/auth.js';
+
 const router = express.Router();
-// checkout
-router.post('/checkout',checkout);
-// verify-payment & save to db
-router.post('/verify-payment',verify)
-// user order
-router.get("/userorder",Authenticated, userOrder);
-// All order's
-router.get("/orders", allOrders);
 
+// Route to place order directly (COD style)
+router.post('/checkout', checkout);
 
+// Route to get user orders (Keep this as is)
+router.get('/userorder', Authenticated, userOrder);
 
-
-export default router
+export default router;
